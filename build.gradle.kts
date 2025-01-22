@@ -59,6 +59,8 @@ dependencies {
 
     // WebClient 의존성
     implementation ("org.springframework.boot:spring-boot-starter-webflux")
+    implementation ("io.netty:netty-resolver-dns-native-macos:4.1.94.Final:osx-aarch_64") // 최신 버전 확인
+    implementation ("org.springframework.boot:spring-boot-starter-web")
 
 }
 
