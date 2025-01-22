@@ -3,10 +3,9 @@ package org.com.stocknote.domain.stock.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.domain.stock.dto.StockDailyResponse;
-import org.com.stocknote.domain.stock.dto.StockInfoResponse;
-import org.com.stocknote.domain.stock.dto.StockPriceResponse;
-import org.com.stocknote.domain.stock.dto.StockTimeResponse;
+import org.com.stocknote.domain.stock.PeriodType;
+import org.com.stocknote.domain.stock.dto.*;
+import org.com.stocknote.domain.stock.service.StockChartService;
 import org.com.stocknote.domain.stock.service.StockInfoService;
 import org.com.stocknote.domain.stock.service.StockService;
 import org.com.stocknote.global.dto.GlobalResponse;
@@ -23,6 +22,7 @@ import java.time.LocalDate;
 public class StockController {
     private final StockService stockService;
     private final StockInfoService stockInfoService;
+    private final StockChartService stockChartService;
 
     //이름으로 종목 검색
     @GetMapping
@@ -79,6 +79,15 @@ public class StockController {
     @Operation(summary = "당일 시간대별 체결 정보 조회")
     public StockTimeResponse getTimeStockPrices(@RequestParam String stockCode) {
         return stockService.getTimeStockPrices(stockCode);
+    }
+
+    @GetMapping("/chart")
+    public ChartResponse getChartData(
+            @RequestParam String stockCode,
+            @RequestParam PeriodType periodType,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
+        return stockChartService.getChartData(stockCode, periodType, startDate, endDate);
     }
 
 }
