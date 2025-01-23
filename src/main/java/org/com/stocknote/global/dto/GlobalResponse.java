@@ -1,6 +1,7 @@
 package org.com.stocknote.global.dto;
 
 import lombok.Getter;
+import org.com.stocknote.domain.member.dto.MemberDto;
 import org.com.stocknote.global.error.ErrorCode;
 import java.time.LocalDateTime;
 

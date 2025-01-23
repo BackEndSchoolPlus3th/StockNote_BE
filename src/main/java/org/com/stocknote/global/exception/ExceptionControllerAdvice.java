@@ -66,4 +66,5 @@ public class ExceptionControllerAdvice {
         log.error("Unhandled Exception: {}", e.getMessage(), e);
         return ErrorResponse.toResponseEntity(ErrorCode.INTERNAL_SERVER_ERROR);
     }
+
 }
