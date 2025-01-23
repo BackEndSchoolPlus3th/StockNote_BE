@@ -1,0 +1,37 @@
+server:
+  port: 8090
+  shutdown: graceful
+spring:
+  autoconfigure:
+    exclude:
+  lifecycle:
+    # 스프링부트가 종료 요청을 받은 후 기다려줄 수 있는 최대한의 시간
+    timeout-per-shutdown-phase: 1h
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://43.203.126.129/default_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: 1234
+#  data:
+#    redis:
+#      host: 172.17.0.1
+#      port: 6379
+#      password: ${custom.secret.spring.data.redis.password}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
+        highlight_sql: false
+        use_sql_comments: false
+logging:
+  level:
+    com.ll.demo03: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.orm.jdbc.bind: INFO
+    org.hibernate.orm.jdbc.extract: INFO
+    org.springframework.transaction.interceptor: INFO
+custom:
+  site:
+    name: "My Site Prod"
