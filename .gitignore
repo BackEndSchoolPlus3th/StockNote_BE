@@ -178,3 +178,9 @@ db.trace.db
 *.tfstate
 *.tfstate.backup
 .terraform.lock.hcl
+
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
