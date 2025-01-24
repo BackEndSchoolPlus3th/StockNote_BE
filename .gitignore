@@ -178,3 +178,5 @@ db.trace.db
 *.tfstate
 *.tfstate.backup
 .terraform.lock.hcl
+application-secret.yml
+application.yml
