@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>거래량 순위</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .back-button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #6c757d;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      transition: background-color 0.3s;
+    }
+    .back-button:hover {
+      background-color: #5a6268;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+    .positive {
+      color: #dc3545;
+    }
+    .negative {
+      color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <a href="/" class="back-button">← 메인으로 돌아가기</a>
+  <h1>거래량 순위</h1>
+  <table>
+    <thead>
+    <tr>
+      <th>순위</th>
+      <th>종목명</th>
+      <th>종목코드</th>
+      <th>현재가</th>
+      <th>전일대비</th>
+      <th>등락률</th>
+      <th>거래량</th>
+      <th>전일거래량</th>
+    </tr>
+    </thead>
+    <tbody id="volumeData">
+    </tbody>
+  </table>
+</div>
+
+<script>
+  fetch('/api/volume')
+          .then(response => response.json())
+          .then(data => {
+            const tbody = document.getElementById('volumeData');
+            data.output.forEach(item => {
+              const priceChange = item.prdy_vrss;
+              const changeClass = item.prdy_vrss_sign === '2' ? 'positive' :
+                      item.prdy_vrss_sign === '5' ? 'negative' : '';
+              const changeSymbol = item.prdy_vrss_sign === '2' ? '+' :
+                      item.prdy_vrss_sign === '5' ? '-' : '';
+
+              const row = `
+                        <tr>
+                            <td>${item.data_rank}</td>
+                            <td>${item.hts_kor_isnm}</td>
+                            <td>${item.mksc_shrn_iscd}</td>
+                            <td>${Number(item.stck_prpr).toLocaleString()}</td>
+                            <td class="${changeClass}">${changeSymbol}${Number(priceChange).toLocaleString()}</td>
+                            <td class="${changeClass}">${changeSymbol}${item.prdy_ctrt}%</td>
+                            <td>${Number(item.acml_vol).toLocaleString()}</td>
+                            <td>${Number(item.prdy_vol).toLocaleString()}</td>
+                        </tr>
+                    `;
+              tbody.innerHTML += row;
+            });
+          })
+          .catch(error => console.error('Error:', error));
+</script>
+</body>
+</html>
