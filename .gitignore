@@ -180,3 +180,9 @@ db.trace.db
 .terraform.lock.hcl
 application-secret.yml
 application.yml
+
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/

@@ -33,8 +33,8 @@ public class PortfolioService {
     savePfList(portfolio);
   }
 
-  public void update(PortfolioPatchRequest portfolioPatchRequest) {
-    Portfolio portfolio = portfolioRepository.findById(portfolioPatchRequest.getId())
+  public void update(Long portfoliNo, PortfolioPatchRequest portfolioPatchRequest) {
+    Portfolio portfolio = portfolioRepository.findById(portfoliNo)
         .orElse(null);
     // 여기서 실패하면 프론트에 실패했다는 코드를 띄워줘야함
     if (portfolio == null) {
