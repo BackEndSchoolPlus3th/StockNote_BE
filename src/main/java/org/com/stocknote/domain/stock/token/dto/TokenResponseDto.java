@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+
+// merge 오류 해결용 주석
+
 @Getter
 @Setter
 public class TokenResponseDto {

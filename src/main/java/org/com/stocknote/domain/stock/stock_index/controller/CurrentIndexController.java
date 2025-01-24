@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+
+// merge 오류 해결용 주석
+
 @RestController
 @RequiredArgsConstructor
 public class CurrentIndexController {

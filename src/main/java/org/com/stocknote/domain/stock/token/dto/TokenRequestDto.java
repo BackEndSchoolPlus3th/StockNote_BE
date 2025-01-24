@@ -3,6 +3,8 @@ package org.com.stocknote.domain.stock.token.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+// merge 오류 해결용 주석
+
 @Getter
 @Setter
 public class TokenRequestDto {

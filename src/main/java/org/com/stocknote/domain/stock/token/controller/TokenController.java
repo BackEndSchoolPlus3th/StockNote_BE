@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+// merge 오류 해결용 주석
+
 @RestController
 @RequiredArgsConstructor
 public class TokenController {

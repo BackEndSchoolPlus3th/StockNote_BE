@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+// merge 오류 해결용 주석
+
 @Service
 @RequiredArgsConstructor
 public class CurrentIndexService {
