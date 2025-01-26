@@ -179,7 +179,7 @@ db.trace.db
 *.tfstate.backup
 .terraform.lock.hcl
 application-secret.yml
-application.yml
+application-secret-prod.yml
 
 .gradle
 build/
