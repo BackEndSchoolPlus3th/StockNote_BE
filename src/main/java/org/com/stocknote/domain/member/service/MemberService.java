@@ -51,4 +51,9 @@ public class MemberService {
 
         return MemberDto.of(member);
     }
+
+  public Member findByEmail(String userEmail) {
+        return memberRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new EntityNotFoundException("회원을 찾을 수 없습니다. 이메일: " + userEmail));
+  }
 }

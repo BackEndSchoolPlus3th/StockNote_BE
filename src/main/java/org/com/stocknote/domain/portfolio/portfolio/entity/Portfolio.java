@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
 import org.com.stocknote.global.base.BaseEntity;
 
@@ -20,7 +21,6 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 public class Portfolio extends BaseEntity {
-  private String category;
   private String name;
   private String description;
   private int totalAsset;
@@ -30,6 +30,9 @@ public class Portfolio extends BaseEntity {
 
   @Column(nullable = true)
   private LocalDateTime deletedAt;
+
+  @ManyToOne
+  private Member member;
 
   @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL)
   private List<PfStock> pfStockList = new ArrayList<>();  // 초기화 추가

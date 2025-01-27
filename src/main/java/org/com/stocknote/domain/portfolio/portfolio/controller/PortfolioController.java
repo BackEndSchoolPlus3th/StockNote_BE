@@ -2,6 +2,8 @@ package org.com.stocknote.domain.portfolio.portfolio.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.com.stocknote.domain.member.entity.Member;
+import org.com.stocknote.domain.member.service.MemberService;
 import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioPatchRequest;
 import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioRequest;
 import org.com.stocknote.domain.portfolio.portfolio.dto.PortfolioResponse;
@@ -13,6 +15,8 @@ import org.com.stocknote.domain.portfolio.portfolioStock.entity.PfStock;
 import org.com.stocknote.domain.portfolio.portfolioStock.service.PfStockService;
 import org.com.stocknote.domain.stock.entity.Stock;
 import org.com.stocknote.global.dto.GlobalResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +28,7 @@ import java.util.stream.Collectors;
 public class PortfolioController {
   private final PortfolioService portfolioService;
   private final PfStockService pfStockService;
+  private final MemberService memberService;
 
   @GetMapping
   public GlobalResponse<List<PortfolioResponse>> getPortfolioList() {
@@ -43,7 +48,8 @@ public class PortfolioController {
   }
 
   @PostMapping
-  public GlobalResponse<String> addPortfolio(@RequestBody PortfolioRequest portfolioRequest) {
+  public GlobalResponse<String> addPortfolio(@RequestBody PortfolioRequest portfolioRequest)
+  {
     portfolioService.save(portfolioRequest);
     return GlobalResponse.success("PortfolioList post");
   }

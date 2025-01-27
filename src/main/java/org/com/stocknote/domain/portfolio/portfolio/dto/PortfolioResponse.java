@@ -24,7 +24,6 @@ public class PortfolioResponse {
   public static PortfolioResponse from(Portfolio portfolio) {
     return PortfolioResponse.builder()
         .id(portfolio.getId())
-        .category(portfolio.getCategory())
         .name(portfolio.getName())
         .description(portfolio.getDescription())
         .totalAsset(portfolio.getTotalAsset())
