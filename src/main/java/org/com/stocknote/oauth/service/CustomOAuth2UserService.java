@@ -2,6 +2,7 @@ package org.com.stocknote.oauth.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.com.stocknote.global.error.ErrorCode;
 import org.com.stocknote.global.exception.CustomException;
 import org.com.stocknote.oauth.entity.OAuth2UserInfo;
@@ -20,6 +21,7 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,6 +31,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
@@ -72,13 +75,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2AccessToken accessToken = getAccessToken(clientRegistration, code);
 
         // 3. UserInfo 요청 및 처리
-        Map<String, Object> attributes = getUserInfo(clientRegistration, accessToken);
+        Map<String, Object> attributes = getUserInfo2(clientRegistration, accessToken);
 
         // 4. OAuth2UserInfo 객체 생성
         OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfo.of(registrationId, attributes);
 
         // 5. 회원 저장 및 반환
         Member member = getOrSave(oAuth2UserInfo);
+        System.out.println("member: " + member);
         return new PrincipalDetails(member, attributes, clientRegistration.getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName());
     }
 
@@ -108,51 +112,62 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private OAuth2AccessToken getAccessToken(ClientRegistration clientRegistration, String code) {
-        // Access Token 요청을 위한 URI
-        String tokenUri = clientRegistration.getProviderDetails().getTokenUri();
-
-        // HTTP 요청 헤더 생성
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        System.out.println("clientRegistration.: " + clientRegistration);
 
-        // 요청 바디 생성
-        String body = "grant_type=authorization_code" +
-                "&client_id=" + clientRegistration.getClientId() +
-                "&client_secret=" + clientRegistration.getClientSecret() +
-                "&redirect_uri=" + clientRegistration.getRedirectUri() +
-                "&code=" + code;
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", clientRegistration.getClientId());
+        params.add("client_secret", clientRegistration.getClientSecret());
+        params.add("code", code);
+        params.add("redirect_uri", clientRegistration.getRedirectUri());
 
-        // HTTP 요청 생성
-        HttpEntity<String> request = new HttpEntity<>(body, headers);
 
-        // RestTemplate을 사용하여 요청 보내기
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Map> response = restTemplate.exchange(
-                tokenUri,
-                HttpMethod.POST,
-                request,
+        System.out.println("redirect_uri: " + clientRegistration.getRedirectUri());
+
+        // 디버깅을 위한 로그 추가
+        log.info("Token request params: {}", params);
+
+        RestTemplate rt = new RestTemplate();
+        ResponseEntity<Map> resp = rt.postForEntity(
+                "https://oauth2.googleapis.com/token",
+                new HttpEntity<>(params, headers),
                 Map.class
         );
-
-        // Access Token 추출
-        Map<String, Object> responseBody = response.getBody();
-        String tokenValue = (String) responseBody.get("access_token");
-        long expiresIn = ((Number) responseBody.get("expires_in")).longValue();
-
-        // OAuth2AccessToken 객체 생성
+        if (!resp.getStatusCode().is2xxSuccessful()) {
+            throw new IllegalStateException("Token request failed: " + resp);
+        }
+        Map body = resp.getBody();
+        String tokenValue = (String) body.get("access_token");
+        Number expiresIn = (Number) body.get("expires_in");
         return new OAuth2AccessToken(
                 OAuth2AccessToken.TokenType.BEARER,
                 tokenValue,
                 Instant.now(),
-                Instant.now().plusSeconds(expiresIn)
+                Instant.now().plusSeconds(expiresIn.longValue())
         );
     }
 
     public ClientRegistration getClientRegistration(String registrationId) {
         ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(registrationId);
+        System.out.println("re:"+registrationId);
         if (clientRegistration == null) {
             throw new IllegalArgumentException("Invalid registrationId: " + registrationId);
         }
         return clientRegistration;
+    }
+    private Map<String, Object> getUserInfo2(ClientRegistration cr, OAuth2AccessToken token) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token.getTokenValue());
+
+        RestTemplate rt = new RestTemplate();
+        ResponseEntity<Map> resp = rt.exchange(
+                cr.getProviderDetails().getUserInfoEndpoint().getUri(),
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                Map.class
+        );
+        return resp.getBody();
     }
 }

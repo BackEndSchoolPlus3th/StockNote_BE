@@ -38,7 +38,6 @@ public class SecurityConfig {
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-resources/**",
-                        "/auth/login/kakao/**",
                         "/error",
                         "/swagger-ui/oauth2-redirect.html",
                         "/favicon.ico"
@@ -64,20 +63,21 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(
                                 "/",
-                                "/auth/",
                                 "/api/filtered/*",
                                 "/api/kospi",
                                 "/api/kosdaq",
                                 "/api/kospi200",
                                 "/api/volume",
-                                "/auth/google/redirect",
                                 "/swagger-ui/**",
                                 "/swagger-ui/oauth2-redirect.html",// Swagger UI 경로 허용
                                 "/v3/api-docs/**",
+                                "/auth/kakao/callback",
+                                "/auth/google/redirect",
                                 "/auth/kakao/redirect",
-                                "/auth/login",
-                                "/auth/kakao/callback"
-
+                                "/auth/google/manual",
+                                "/auth/kakao/manual",
+                                "/auth/google/token",
+                                "/oauth2.googleapis.com/token"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -95,8 +95,9 @@ public class SecurityConfig {
                 .oauth2Login(oauth -> // OAuth2 로그인 기능에 대한 여러 설정의 진입점
                 oauth.userInfoEndpoint(c -> c.userService(oAuth2UserService)) //userInfoEndpoint: OAuth2 로그인 성공 후 사용자 정보를 가져오는 설정. oAuth2UserService를 통해 사용자 정보를 처리합니다.
                         .successHandler(oAuth2SuccessHandler) //로그인 설정 후 핸들러, oAuth2SuccessHandler에서 후속 작업을 처리
-                        .redirectionEndpoint(endpoint ->
-                                endpoint.baseUri("/auth/google/redirect"))
+                        .redirectionEndpoint(e -> e
+                                .baseUri("/auth/google/redirect")
+                        )
                 )
 
                 // jwt 관련 설정

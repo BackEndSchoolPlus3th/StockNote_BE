@@ -18,19 +18,23 @@ public class SwaggerConfig {
                 .title("StockNote API")
                 .version("v1.0.0");
 
-        String securityRequirementName = "accessToken을 붙여넣으세요, Bearer는 필요 없습니다.";
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList(securityRequirementName);
+        // 스키마 이름을 'JWT' 라고 간단히 표현
+        String securitySchemeName = "JWT";
 
+        // 요구 사항(“Authorize”) 생성
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(securitySchemeName);
+
+        // bearer 인증 스키마 구성
         Components components = new Components()
-                .addSecuritySchemes(securityRequirementName, new SecurityScheme()
-                        .name(securityRequirementName)
-                        .type(SecurityScheme.Type.HTTP)
-                        .scheme("bearer")
-                        .bearerFormat("JWT"));
+                .addSecuritySchemes(securitySchemeName, new SecurityScheme()
+                        .name("Authorization")            // HTTP Header 이름
+                        .type(SecurityScheme.Type.HTTP)   // HTTP 방식
+                        .scheme("bearer")                // Bearer 방식
+                        .bearerFormat("JWT"));           // JWT 포맷
 
         return new OpenAPI()
                 .info(info)
-                .addSecurityItem(securityRequirement) // 인증 정보를 Global하게 사용할 수 있게 만듦
-                .components(components); // securityRequirementName이 어떤 방식으로 동작하는지 설정함
+                .addSecurityItem(securityRequirement) // 글로벌 적용
+                .components(components);
     }
 }

@@ -18,6 +18,7 @@ public record OAuth2UserInfo(
     public static OAuth2UserInfo of(String registrationId, Map<String, Object> attributes) {
         return switch (registrationId) { // registration id별로 userInfo 생성
             case "google" -> ofGoogle(attributes);
+            case "googleManual" -> ofGoogle(attributes);
             case "kakao" -> ofKakao(attributes);
             default -> throw new CustomException(ErrorCode.ILLEGAL_REGISTRATION_ID);
         };
