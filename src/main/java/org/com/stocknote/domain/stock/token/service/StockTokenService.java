@@ -37,25 +37,26 @@ public class StockTokenService {
 
     // 저장된 토큰 발급
     public String getAccessToken() {
-        if (cachedToken == null) {
-            cachedToken = generateNewToken();
-        }
+//        if (cachedToken == null) {
+//            cachedToken = generateNewToken();
+//        }
 
-        return cachedToken;
+        return "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6ImIxMWQ1NzZlLWY1NjMtNDJiZS1iMTFmLTg2OTQyZGFjNDRkMCIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTczODA2MTY3MCwiaWF0IjoxNzM3OTc1MjcwLCJqdGkiOiJQU201OXR1NHVFUmlXTTVuRzVjSThOdEVIb1kwcW5NQmJSMEsifQ.u5hwkoSL9lb2O-vwNdKQKNLAvYzubMjema88utcqnkMyq5O0CG4D5eSBnJTbNDQI9UvHLSGXWtHvyb3rpYmwUA";
     }
 
-    // 접근 토큰 발급
+    //    접근 토큰 발급
     public String generateNewToken() {
         TokenRequestDto tokenRequestDto = new TokenRequestDto("client_credentials", appKey, appSecret);
 
-        return webClient.post()
-                .uri("/oauth2/tokenP")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(tokenRequestDto)
-                .retrieve()
-                .bodyToMono(TokenResponseDto.class)
-                .map(TokenResponseDto::getAccessToken)
-                .block();
+        return null;
+//        return webClient.post()
+//                .uri("/oauth2/tokenP")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .bodyValue(tokenRequestDto)
+//                .retrieve()
+//                .bodyToMono(TokenResponseDto.class)
+//                .map(TokenResponseDto::getAccessToken)
+//                .block();
     }
 
     // 토큰 자동 갱신 로직

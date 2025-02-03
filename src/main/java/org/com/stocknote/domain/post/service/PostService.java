@@ -1,14 +1,17 @@
 package org.com.stocknote.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
+import org.com.stocknote.domain.comment.repository.CommentRepository;
 import org.com.stocknote.domain.hashtag.entity.Hashtag;
 import org.com.stocknote.domain.hashtag.service.HashtagService;
+import org.com.stocknote.domain.like.repository.LikeRepository;
 import org.com.stocknote.domain.member.entity.Member;
-import org.com.stocknote.domain.member.repository.MemberRepository;
+import org.com.stocknote.domain.post.dto.MyPostResponseDto;
 import org.com.stocknote.domain.post.dto.PostCreateDto;
 import org.com.stocknote.domain.post.dto.PostModifyDto;
 import org.com.stocknote.domain.post.dto.PostResponseDto;
 import org.com.stocknote.domain.post.entity.Post;
+import org.com.stocknote.domain.post.entity.PostCategory;
 import org.com.stocknote.domain.post.repository.PostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,15 +24,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
     private final HashtagService hashtagService;
+    private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
 
     @Transactional
-    public Long createPost(PostCreateDto postCreateDto, String userEmail) {
-        Member member = memberRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found for email = " + userEmail));
+    public Long createPost(PostCreateDto postCreateDto, Member member) {
 
-        Post post = postCreateDto.toEntity(member.getId());
+        Post post = postCreateDto.toEntity(member);
         Post savedPost = postRepository.save(post);
 
         hashtagService.createHashtags(savedPost.getId(), postCreateDto.getHashtags());
@@ -42,7 +44,25 @@ public class PostService {
         return posts.map(post -> {
             List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId()).stream()
                     .map(Hashtag::getName).toList();
+
+//            Long likeCount = likeRepository.countByPostId(post.getId());
+
             return PostResponseDto.fromPost(post, hashtags);
+        });
+    }
+
+    @Transactional(readOnly=true)
+    public Page<PostResponseDto> getPostsByCategory(PostCategory category, Pageable pageable) {
+        Page<Post> posts = postRepository.findByCategory(category, pageable);  // Pageable 추가
+        return posts.map(post -> {
+            List<String> hashtags = hashtagService.getHashtagsByPostId(post.getId())
+                    .stream()
+                    .map(Hashtag::getName)
+                    .toList();
+
+//            Long likeCount = likeRepository.countByPostId(post.getId());
+            return PostResponseDto.fromPost(post, hashtags);
+
         });
     }
 
@@ -56,6 +76,7 @@ public class PostService {
                 .map(Hashtag::getName)
                 .toList();
 
+//        Long likeCount = likeRepository.countByPostId(post.getId());
         return PostResponseDto.fromPost(post, hashtags);
     }
 
@@ -71,12 +92,17 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long id) {
-        Post post = postRepository.findById(id)
+    public void deletePost(Long postId) {
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         post.softDelete();
         postRepository.save(post);
+        commentRepository.deleteByPostId(postId);
+        likeRepository.deleteByPostId(postId);
+        hashtagService.deleteHashtagsByPostId(postId);
+    }
 
-        hashtagService.deleteHashtagsByPostId(id);
+    public Page<MyPostResponseDto> findPostsByMember(Member member, Pageable pageable) {
+        return postRepository.findByMember(member, pageable).map(MyPostResponseDto::of);
     }
 }

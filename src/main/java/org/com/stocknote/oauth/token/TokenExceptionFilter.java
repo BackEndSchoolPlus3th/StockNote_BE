@@ -17,7 +17,7 @@ public class TokenExceptionFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+                                    FilterChain filterChain) {
         try {
             filterChain.doFilter(request, response);
         } catch (CustomException e) {

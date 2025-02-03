@@ -15,6 +15,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -43,6 +48,37 @@ public class SecurityConfig {
                         "/favicon.ico"
                 );
     }
+
+//    @Bean
+//    public ClientRegistrationRepository clientRegistrationRepository() {
+//        ClientRegistration kakaoRegistration = ClientRegistration.withRegistrationId("kakao")
+//                .clientId("246f48e802f02443cf4efc58b10c1279")
+//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
+//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//                .redirectUri("{baseUrl}/auth/{registrationId}/redirect")
+//                .scope("profile_nickname", "profile_image", "account_email")
+//                .authorizationUri("https://kauth.kakao.com/oauth/authorize")
+//                .tokenUri("https://kauth.kakao.com/oauth/token")
+//                .userInfoUri("https://kapi.kakao.com/v2/user/me")
+//                .userNameAttributeName("id")
+//                .clientName("Kakao")
+//                .build();
+//        ClientRegistration googleRegistration = ClientRegistration.withRegistrationId("google")
+//                .clientId("your-google-client-id")
+//                .clientSecret("your-google-client-secret")
+//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//                .redirectUri("{baseUrl}/auth/{registrationId}/redirect")
+//                .scope("email", "profile")
+//                .authorizationUri("https://accounts.google.com/o/oauth2/v2/auth")
+//                .tokenUri("https://www.googleapis.com/oauth2/v4/token")
+//                .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
+//                .userNameAttributeName("sub")
+//                .clientName("Google")
+//                .build();
+//
+//        return new InMemoryClientRegistrationRepository(kakaoRegistration);
+//    }
 
 
     @Bean
@@ -73,30 +109,23 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/auth/kakao/callback",
                                 "/auth/google/redirect",
-                                "/auth/kakao/redirect",
                                 "/auth/google/manual",
                                 "/auth/kakao/manual",
                                 "/auth/google/token",
-                                "/oauth2.googleapis.com/token"
+                                "/oauth2.googleapis.com/token",
+                                "/api/v1/post/*",
+                                "/api/v1/post/**",
+                                "/api/v1/post"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-//                // request 인증, 인가 설정
-//                .authorizeHttpRequests(request ->
-//                        request.requestMatchers(
-//                                new AntPathRequestMatcher("/"),
-////                                new AntPathRequestMatcher("/auth/success"),
-//                                new AntPathRequestMatcher("/auth/google/redirect")
-//                                ).permitAll() //
-//                .anyRequest().authenticated() //나머지는 인증 필요
-//                )
 
                 // oauth2 설정
                 .oauth2Login(oauth -> // OAuth2 로그인 기능에 대한 여러 설정의 진입점
                 oauth.userInfoEndpoint(c -> c.userService(oAuth2UserService)) //userInfoEndpoint: OAuth2 로그인 성공 후 사용자 정보를 가져오는 설정. oAuth2UserService를 통해 사용자 정보를 처리합니다.
                         .successHandler(oAuth2SuccessHandler) //로그인 설정 후 핸들러, oAuth2SuccessHandler에서 후속 작업을 처리
                         .redirectionEndpoint(e -> e
-                                .baseUri("/auth/google/redirect")
+                                .baseUri("/auth/{registrationId}/redirect")
                         )
                 )
 

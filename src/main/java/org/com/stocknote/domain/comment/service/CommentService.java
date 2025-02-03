@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.com.stocknote.domain.comment.dto.CommentDetailResponse;
 import org.com.stocknote.domain.comment.dto.CommentRequest;
 import org.com.stocknote.domain.comment.dto.CommentUpdateDto;
+import org.com.stocknote.domain.comment.dto.MyCommentResponse;
 import org.com.stocknote.domain.comment.entity.Comment;
 import org.com.stocknote.domain.comment.repository.CommentRepository;
 import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.domain.member.repository.MemberRepository;
 
+import org.com.stocknote.domain.post.dto.MyPostResponseDto;
 import org.com.stocknote.global.error.ErrorCode;
 import org.com.stocknote.global.exception.CustomException;
 import org.springframework.data.domain.Page;
@@ -33,7 +35,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
-        Member member = memberRepository.findById(comment.getUserId()).orElseThrow(() -> new IllegalArgumentException("user not found"));
+        Member member = memberRepository.findById(comment.getMember().getId()).orElseThrow(() -> new IllegalArgumentException("user not found"));
 
         return new CommentDetailResponse(commentId, comment.getBody(), member.getName(), comment.getCreatedAt());
     }
@@ -41,7 +43,7 @@ public class CommentService {
     public Page<CommentDetailResponse> getComments(Long postId, Pageable pageable) {
         Page<CommentDetailResponse> comments = commentRepository.findByPostId(pageable, postId)
                 .map(comment -> {
-                            Member member = memberRepository.findById(comment.getUserId()).orElseThrow(() -> new IllegalArgumentException("user not found"));
+                            Member member = memberRepository.findById(comment.getMember().getId()).orElseThrow(() -> new IllegalArgumentException("user not found"));
                             return new CommentDetailResponse(comment.getId(), comment.getBody(), member.getName(), comment.getCreatedAt());
                         }
                 );
@@ -51,7 +53,7 @@ public class CommentService {
     @Transactional
     public Long createComment(Long postId, CommentRequest commentRequest, String userEmail) {
         Member member = memberRepository.findByEmail(userEmail).orElseThrow();
-        Comment comment = new Comment(postId, commentRequest.getBody(), member.getId());
+        Comment comment = new Comment(postId, commentRequest.getBody(), member);
 
         return commentRepository.save(comment).getId();
     }
@@ -62,7 +64,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentUpdateDto.getCommentId())
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
-        if (!Objects.equals(member.getId(), comment.getUserId())) {
+        if (!Objects.equals(member.getId(), comment.getMember().getId())) {
             throw new CustomException(ErrorCode.COMMENT_UPDATE_DENIED);
         }
 
@@ -76,9 +78,13 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
-        if (!Objects.equals(member.getId(), comment.getUserId())) {
+        if (!Objects.equals(member.getId(), comment.getMember().getId())) {
             throw new CustomException(ErrorCode.COMMENT_DELETE_DENIED);
         }
         commentRepository.delete(comment);
+    }
+
+    public Page<MyCommentResponse> findCommentsByMember(Member member, Pageable pageable) {
+        return commentRepository.findByMember(member, pageable).map(MyCommentResponse::of);
     }
 }

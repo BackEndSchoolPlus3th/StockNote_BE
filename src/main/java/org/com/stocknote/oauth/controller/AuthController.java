@@ -3,7 +3,7 @@ package org.com.stocknote.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.com.stocknote.oauth.service.CustomOAuth2UserService;
+import org.com.stocknote.oauth.service.OAuth2TokenService;
 import org.com.stocknote.oauth.token.TokenProvider;
 import org.com.stocknote.oauth.token.entity.Token;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ import java.util.Map;
 @Tag(name = "스웨거 로그인 API", description = "Google, Kakao 로그인 API")
 public class AuthController {
 
-    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2TokenService oAuth2TokenService;
     private final TokenProvider tokenProvider;
 
     @GetMapping("/google/manual")
@@ -50,7 +50,7 @@ public class AuthController {
     @Operation(summary = "구글 로그인(토큰 발급용)")
     public ResponseEntity<?> getGoogleToken(@RequestParam String code) {
         // (A) code 로 구글 AccessToken + 유저정보 획득
-        OAuth2User oAuth2User = customOAuth2UserService.processOAuth2User("googleManual", code);
+        OAuth2User oAuth2User = oAuth2TokenService.processOAuth2User("googleManual", code);
 
         // (B) DB 저장은 processOAuth2User() 내부에서
         //     customOAuth2UserService.getOrSave(...) 로 처리됨

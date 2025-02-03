@@ -11,12 +11,14 @@ import org.com.stocknote.domain.member.entity.Member;
 @ToString
 @Builder
 public class MemberDto {
+    private Long id;
     private String email;
     private String name;
     private String profile;
 
     public static MemberDto of (Member member) {
         return MemberDto.builder()
+                .id(member.getId())
                 .email(member.getEmail())
                 .name(member.getName())
                 .profile(member.getProfile())

@@ -1,11 +1,11 @@
 package org.com.stocknote.domain.comment.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.com.stocknote.domain.member.entity.Member;
 import org.com.stocknote.global.base.BaseEntity;
 
 @Entity
@@ -18,17 +18,17 @@ public class Comment extends BaseEntity {
     @Column(nullable = false)
     private Long postId;
 
-
     @Setter
     @Column(nullable = false)
     private String body;
 
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Member member;
 
-    public Comment(Long postId, String body, Long userId) {
+    public Comment(Long postId, String body, Member member) {
         this.postId = postId;
         this.body = body;
-        this.userId = userId;
+        this.member = member;
     }
 }

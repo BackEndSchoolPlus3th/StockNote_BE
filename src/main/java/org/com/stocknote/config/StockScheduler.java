@@ -48,7 +48,7 @@ public class StockScheduler {
       Files.copy(pythonScript.getInputStream(), tempScript.toPath(),
           StandardCopyOption.REPLACE_EXISTING);
 
-      ProcessBuilder processBuilder = new ProcessBuilder("python3", tempScript.getAbsolutePath());
+      ProcessBuilder processBuilder = new ProcessBuilder("python", tempScript.getAbsolutePath());
       processBuilder.redirectErrorStream(true); // 에러 스트림을 표준 출력으로 리다이렉트
       Process process = processBuilder.start();
 

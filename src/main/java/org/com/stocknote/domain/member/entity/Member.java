@@ -28,7 +28,15 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
+    private String providerId;
+
     @OneToMany(mappedBy = "member")
     private List<Stock> stockList = new ArrayList<>();
+
+    public void updateName(String newName) {
+        this.name = newName;
+    }
 
 }
