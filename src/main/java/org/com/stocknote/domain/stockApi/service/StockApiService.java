@@ -29,9 +29,13 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+// 받아온 정보들을 우리 서비스에 맞게끔 데이터를 parsing 하고, cleaning해서 내려주는 역할
 public class StockApiService {
 
+    // webClientBuilder
     private final WebClient.Builder webClientBuilder;
+    private final WebClient webClient;
+    private final NaverApiClient naverApiClient;
     private final StockTokenService stockTokenService;
     private final StockRepository stockRepository;
     private final ObjectMapper objectMapper;
@@ -39,30 +43,21 @@ public class StockApiService {
     //임시 추가
     private final RestTemplate restTemplate;
 
+    // getKospi -> /uapi/domestic-stock/v1/quotations/volume-rank api call
     public Mono<CurrentIndexResponse> getKOSPI() {
         String accessToken = stockTokenService.getAccessToken();
-        WebClient webClient = webClientBuilder.baseUrl(stockTokenService.getIndexBaseUrl()).build();
+//        WebClient webClient = webClientBuilder.baseUrl(stockTokenService.getIndexBaseUrl()).build();
 
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/uapi/domestic-stock/v1/quotations/volume-rank")
-                        .queryParam("FID_COND_MRKT_DIV_CODE", "U")
-                        .queryParam("FID_INPUT_ISCD", "0001")
-                        .build())
-                .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .header("tr_id", "FHPUP02100000")
-                .header("custtype", "P")
-                .header("appkey", stockTokenService.getAppKey())
-                .header("appsecret", stockTokenService.getAppSecret())
-                .header("authorization", "Bearer " + accessToken)
-                .retrieve()
-                .bodyToMono(CurrentIndexResponse.class);
+        // service를 분리시키는 것
+        // service 내에서 header, bodytoMono 이런 Template들을 단순화 시키는 것(library를 통해서)
+        return naverApiClient.getKospi();
     }
 
     public Mono<CurrentIndexResponse> getKOSDAQ() {
         String accessToken = stockTokenService.getAccessToken();
         WebClient webClient = webClientBuilder.baseUrl(stockTokenService.getIndexBaseUrl()).build();
 
+        // template 코드
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/uapi/domestic-stock/v1/quotations/volume-rank")

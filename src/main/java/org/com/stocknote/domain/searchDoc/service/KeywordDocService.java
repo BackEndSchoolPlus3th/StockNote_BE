@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class KeywordDocService {
+    // @Query -> elasticsearchOperations
     private final ElasticsearchOperations elasticsearchOperations;
     private final KeywordDocRepository keywordDocRepository;
 

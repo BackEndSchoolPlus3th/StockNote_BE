@@ -93,6 +93,10 @@ public class SearchDocService {
     if (category == null || PostCategory.ALL.name().equals(category)) {
       return switch (condition.getSearchType()) {
         case TITLE -> postDocRepository.searchByTitle(condition.getKeyword(), pageable);
+        // logging: enable -> elastic search raw query 정상 1
+        // spring application query를 날렸을 때는 검색 결과가 없다 2
+        // 쿼리 1, 쿼리 2 비교
+        // JPA -> query console
         case CONTENT -> postDocRepository.searchByContent(condition.getKeyword(), pageable);
         case USERNAME -> postDocRepository.searchByUsername(condition.getKeyword(), pageable);
         case HASHTAG -> postDocRepository.searchByHashtag(condition.getKeyword(), pageable);

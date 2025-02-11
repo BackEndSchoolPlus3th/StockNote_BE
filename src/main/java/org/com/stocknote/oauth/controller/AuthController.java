@@ -49,6 +49,7 @@ public class AuthController {
     @PostMapping("/google/token")
     @Operation(summary = "구글 로그인(토큰 발급용)")
     public ResponseEntity<?> getGoogleToken(@RequestParam String code) {
+        // serivce
         // (A) code 로 구글 AccessToken + 유저정보 획득
         OAuth2User oAuth2User = oAuth2TokenService.processOAuth2User("googleManual", code);
 

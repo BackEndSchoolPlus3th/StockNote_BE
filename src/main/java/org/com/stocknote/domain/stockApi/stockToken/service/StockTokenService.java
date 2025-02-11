@@ -3,7 +3,9 @@ package org.com.stocknote.domain.stockApi.stockToken.service;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.common.subtyping.qual.Bottom;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatusCode;
@@ -49,8 +51,10 @@ public class StockTokenService {
         this.tokenWebClient = webClientBuilder.baseUrl("https://openapi.koreainvestment.com:9443").build();
     }
 
-    @PostConstruct
-    public void initWebClient() {
+//    @PostConstruct
+    @Bean
+    public void webClient() {
+        // log.debug("post construct ${StockTokenService}")
         this.tokenWebClient = WebClient.builder()
                 .baseUrl(tokenBaseUrl)
                 .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
@@ -93,7 +97,8 @@ public class StockTokenService {
         try {
             Map<String, Object> response = websocketWebClient
                     .post()
-                    .uri("/oauth2/Approval")
+                    // 한국 투자증권 rest API, websocket
+                    .uri("{domain}/oauth2/Approval")
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(Map.of(
                             "grant_type", "client_credentials",
@@ -167,6 +172,7 @@ public class StockTokenService {
                         "appsecret", appSecret
                 ))
                 .retrieve()
+                // ParameterizedTypeReference dto
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                 .retryWhen(reactor.util.retry.Retry.fixedDelay(3, java.time.Duration.ofSeconds(2)))  // ✅ 3번 재시도, 2초 간격
                 .doOnError(e -> log.error("❌ [ACCESS TOKEN 신규 발급 실패] {}", e.getMessage()))

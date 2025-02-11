@@ -71,3 +71,7 @@ custom:
     cookieDomain: "${custom.dev.cookieDomain}"
     frontUrl: "${custom.dev.frontUrl}"
     backUrl: "${custom.dev.backUrl}"
+    security:
+      - "/oauth2/**",
+      - "/auth/**",
+      - "/auth/login",

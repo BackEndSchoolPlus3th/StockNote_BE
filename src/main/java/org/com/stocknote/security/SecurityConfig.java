@@ -35,7 +35,6 @@ public class SecurityConfig {
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
     private final CorsConfigurationSource corsConfigurationSource;
     private final SaveRequestFilter saveRequestFilter;
-    private final TokenProvider tokenProvider;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
@@ -117,6 +116,8 @@ public class SecurityConfig {
                                 .redirectionEndpoint(e -> e
                                         .baseUri("/auth/{registrationId}/redirect")
                                 )
+                                // exception -> exception handler에서 처리
+                                // spring security failureHandler 다른 class에 정의해놓는다던지
                                 .failureHandler((request, response, exception) -> {
                                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                                     response.setContentType("application/json;charset=UTF-8");

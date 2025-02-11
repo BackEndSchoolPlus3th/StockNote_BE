@@ -32,6 +32,8 @@ dependencies {
     annotationProcessor("com.querydsl:querydsl-apt:$querydslVersion:jakarta")
     annotationProcessor("jakarta.annotation:jakarta.annotation-api")
     annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+    implementation("co.elastic.clients:elasticsearch-java:8.17.1")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.0")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")

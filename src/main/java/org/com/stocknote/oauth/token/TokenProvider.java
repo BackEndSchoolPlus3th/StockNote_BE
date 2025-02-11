@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
+// jwt token 발행할 때 build만 하는 부분으로써 남기고
 public class TokenProvider {
 
     @Value("${jwt.key}")
@@ -58,10 +59,16 @@ public class TokenProvider {
         tokenService.saveOrUpdate(authentication.getName(), refreshToken, accessToken); // redis에 저장
     }
 
+    // generate token이 제일 주요한 포인트인데 jwt token을 만들기
+    // jwt token 만들 때 signtature를 통해서
+
+
     private String generateToken(Authentication authentication, long expireTime) {
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + expireTime);
 
+        // authorizationService
+        // authorzationService.getPrinipal()
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining());
@@ -70,6 +77,7 @@ public class TokenProvider {
 
         PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
         Long memberId = principalDetails.user().getId();
+        //
 
         return Jwts.builder()
                 .setSubject(memberId.toString())
