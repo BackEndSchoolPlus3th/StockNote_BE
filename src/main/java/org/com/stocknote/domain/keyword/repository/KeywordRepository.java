@@ -9,7 +9,7 @@ import java.util.List;
 public interface KeywordRepository extends JpaRepository<Keyword, Long> {
     void deleteByMemberId(Long id);
 
-    List<org.com.stocknote.domain.keyword.entity.Keyword> findByMemberId(Long id);
+    List<Keyword> findByMemberId(Long id);
 
     List<Keyword> findAllByPostCategory(PostCategory category);
 }

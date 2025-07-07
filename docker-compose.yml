@@ -1,21 +1,71 @@
-version: '3.4'
+version: '3.8'
 
 services:
-  influxdb:
-    image: influxdb:1.8
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: stocknote-redis
+    restart: always
     ports:
-      - "8086:8086"
-    environment:
-      - INFLUXDB_HTTP_AUTH_ENABLED=false
-      - INFLUXDB_DB=k6
-
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_BASIC_ENABLED=false
+      - "6379:6379"
+    command: >
+      redis-server 
+      --appendonly yes 
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
     volumes:
-      - ./grafana:/etc/grafana/provisioning/
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ElasticSearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    container_name: stocknote-elasticsearch
+    restart: always
+    environment:
+      - node.name=stocknote-es
+      - cluster.name=stocknote-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Kibana (선택사항 - ElasticSearch 관리도구)
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.12.0
+    container_name: stocknote-kibana
+    restart: always
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    profiles:
+      - monitoring  # 필요할 때만 실행
+
+volumes:
+  redis_data:
+    driver: local
+  es_data:
+    driver: local

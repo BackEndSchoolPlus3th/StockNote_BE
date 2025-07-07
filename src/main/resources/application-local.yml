@@ -1,0 +1,22 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  # 개발용 상세 로깅
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        use_sql_comments: true
+    show-sql: true
+
+# 개발용 상세 로깅
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.web: DEBUG
+    org.springframework.data: DEBUG
+    org.com.stocknote: DEBUG

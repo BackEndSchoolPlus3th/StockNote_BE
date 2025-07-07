@@ -14,6 +14,22 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
+    // PerformanceTestService에서 사용하는 메서드 추가
+    @Query("SELECT DISTINCT p FROM Post p " +
+            "WHERE (p.title LIKE %:title% OR p.body LIKE %:body%) " +
+            "AND p.deletedAt IS NULL " +
+            "ORDER BY p.createdAt DESC")
+    Page<Post> findByTitleContainingOrBodyContaining(
+            @Param("title") String title,
+            @Param("body") String body,
+            Pageable pageable
+    );
+
+    // 또는 Spring Data JPA 자동 메서드 사용
+    Page<Post> findByTitleContainingOrBodyContainingAndDeletedAtIsNull(
+            String title, String body, Pageable pageable
+    );
+
     @Query("SELECT DISTINCT p FROM Post p " +
             "LEFT JOIN FETCH p.member m " +
             "LEFT JOIN FETCH p.comments c " +

@@ -1,4 +1,4 @@
-//package org.com.stocknote.global.faker;
+package org.com.stocknote.global.faker;//package org.com.stocknote.global.faker;
 //
 //import com.github.javafaker.Faker;
 //import lombok.RequiredArgsConstructor;
