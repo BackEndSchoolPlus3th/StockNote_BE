@@ -104,10 +104,6 @@ dependencies {
     // AOP
     implementation("org.springframework.boot:spring-boot-starter-aop")
 
-    // JMX 및 시스템 모니터링
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("io.micrometer:micrometer-core")
-
 }
 
 tasks.withType<Test> {
@@ -137,8 +133,4 @@ tasks.withType<JavaCompile> {
 }
 tasks.withType<Test> {
     systemProperty("file.encoding", "UTF-8")
-}
-
-tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
-    mainClass.set("org.com.stocknote.StockNoteApplication")
 }

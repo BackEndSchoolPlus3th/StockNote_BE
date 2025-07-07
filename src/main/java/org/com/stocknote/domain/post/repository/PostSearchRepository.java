@@ -10,6 +10,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PostSearchRepository {
     Page<Post> search(PostSearchConditionDto condition, Pageable pageable);
-
-
 }

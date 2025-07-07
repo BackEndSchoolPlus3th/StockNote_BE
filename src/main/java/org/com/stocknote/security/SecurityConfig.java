@@ -101,12 +101,8 @@ public class SecurityConfig {
                                 "/hashtag/search/*",
                                 "/api/v1/posts/popular",
                                 "sse/**",
-                                "/api/v1/searchDocs/**",
-                                "/public/performance/**",
-                                "/api/v1/performance/**",
-                                "/public/test-auth/**",
-                                "/public/test/**"
-                                ).permitAll()
+                                "/api/v1/searchDocs/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
 
